@@ -60,6 +60,12 @@ var testImages = []struct {
 	},
 }
 
+func BenchmarkParse(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		NewMediaFile(testImages[1].filename)
+	}
+}
+
 func Test(t *testing.T) {
 	for _, i := range testImages {
 		m, err := NewMediaFile(i.filename)
