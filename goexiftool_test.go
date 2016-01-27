@@ -16,13 +16,33 @@ var testImages = []struct {
 	geoTagged    bool
 }{
 	{
-		"test/DSC03696.jpg",
+		"test_files/2016-01-02-13h19m03s_A7RII.85mm1.8Z_03943.jpg",
 		nil,
-		230,
+		239,
 		"Zeiss Batis 85mm F1.8",
 		"ILCE-7RM2",
 		"Off, Did not fire",
-		time.Date(2015, time.December, 30, 11, 18, 29, 0, time.UTC),
+		time.Date(2016, time.January, 02, 13, 19, 03, 0, time.UTC),
+		true,
+	},
+	{
+		"test_files/2015-12-20-11h05m19s_A7RII.55mm1.8ZA_02566.jpg",
+		nil,
+		239,
+		"Sony FE 55mm F1.8 ZA",
+		"ILCE-7RM2",
+		"Off, Did not fire",
+		time.Date(2015, time.December, 20, 11, 05, 19, 0, time.UTC),
+		true,
+	},
+	{
+		"test_files/2015-12-21-13h31m44s_A7RII.35mm1.4_02725.jpg",
+		nil,
+		231,
+		"Sigma 35mm f/1.4 DG HSM",
+		"ILCE-7RM2",
+		"Off, Did not fire",
+		time.Date(2015, time.December, 21, 13, 31, 44, 0, time.UTC),
 		false,
 	},
 }

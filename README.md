@@ -12,4 +12,4 @@ then use it:
 
     import "github.com/barsanuphe/goexiftool"
 
-See godoc for more information. 
+See godoc for more information.
