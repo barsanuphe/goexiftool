@@ -1,3 +1,4 @@
+// Package goexiftool is a very simple wrapper around the excellent exiftool (http://www.sno.phy.queensu.ca/~phil/exiftool/).
 package goexiftool
 
 import (
