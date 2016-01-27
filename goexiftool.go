@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -110,8 +111,29 @@ func (m *MediaFile) IsGeoTagged() (isGeoTagged bool) {
 	return
 }
 
+// getExistingPath ensures a path actually exists, and returns an existing absolute path or an error.
+func getExistingPath(path string) (existingPath string, err error) {
+	// check root exists or pwd+root exists
+	if filepath.IsAbs(path) {
+		existingPath = path
+	} else {
+		pwd, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		existingPath = filepath.Join(pwd, path)
+	}
+	// check root exists
+	_, err = os.Stat(existingPath)
+	return
+}
+
 // NewMediaFile initializes a MediaFile and parses its metadata with exiftool.
 func NewMediaFile(filename string) (mf *MediaFile, err error) {
+	filename, err = getExistingPath(filename)
+	if os.IsNotExist(err) {
+		return nil, err
+	}
 	mf = &MediaFile{Filename: filename, Info: make(map[string]string)}
 	err = mf.Analyze()
 	return

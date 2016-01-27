@@ -1,6 +1,9 @@
 package goexiftool
 
 import (
+	"errors"
+	"fmt"
+	"os"
 	"testing"
 	"time"
 )
@@ -15,6 +18,16 @@ var testImages = []struct {
 	date         time.Time
 	geoTagged    bool
 }{
+	{
+		"paf",
+		errors.New("does not exist"),
+		0,
+		"",
+		"",
+		"",
+		time.Time{},
+		false,
+	},
 	{
 		"test_files/2016-01-02-13h19m03s_A7RII.85mm1.8Z_03943.jpg",
 		nil,
@@ -47,88 +60,55 @@ var testImages = []struct {
 	},
 }
 
-func TestAnalyze(t *testing.T) {
+func Test(t *testing.T) {
 	for _, i := range testImages {
 		m, err := NewMediaFile(i.filename)
-		if err != i.analyzeError {
-			t.Errorf("Analyze(%s) returned %s, expected %s!", i.filename, err.Error(), i.analyzeError.Error())
+		fmt.Println("Testing " + i.filename)
+		if i.analyzeError != err {
+			if os.IsNotExist(err) && i.analyzeError.Error() != "does not exist" {
+				t.Errorf("Analyze(%s) returned %s, expected %s!", i.filename, err.Error(), i.analyzeError.Error())
+				return
+			}
 		}
-		if numInfos := len(m.Info); numInfos != i.numInfos {
-			t.Errorf("Analyze(%s) returned %d infos, expected %d!", i.filename, numInfos, i.numInfos)
-		}
-	}
-}
-
-func TestGet(t *testing.T) {
-	for _, i := range testImages {
-		m, err := NewMediaFile(i.filename)
-		if err != nil {
-			t.Errorf("Get(%s) returned %s, expected %s!", i.filename, err.Error(), i.analyzeError.Error())
-		}
-		flash, err := m.Get("Flash")
-		if flash != i.flash {
-			t.Errorf("Get(%s)(Flash) returned %s, expected %s!", i.filename, flash, i.flash)
-		}
-	}
-}
-
-func TestGetLens(t *testing.T) {
-	for _, i := range testImages {
-		m, err := NewMediaFile(i.filename)
-		if err != nil {
-			t.Errorf("GetLens(%s) returned %s, expected %s!", i.filename, err.Error(), i.analyzeError.Error())
-		}
-		lens, err := m.GetLens()
-		if err != nil {
-			t.Errorf("GetLens(%s) returned error %s!", i.filename, err.Error())
-		}
-		if lens != i.lens {
-			t.Errorf("GetLens(%s) returned %s, expected %s!", i.filename, lens, i.lens)
-		}
-	}
-}
-
-func TestGetCamera(t *testing.T) {
-	for _, i := range testImages {
-		m, err := NewMediaFile(i.filename)
-		if err != nil {
-			t.Errorf("GetCamera(%s) returned %s, expected %s!", i.filename, err.Error(), i.analyzeError.Error())
-		}
-		camera, err := m.GetCamera()
-		if err != nil {
-			t.Errorf("GetCamera(%s) returned error %s!", i.filename, err.Error())
-		}
-		if camera != i.camera {
-			t.Errorf("GetCamera(%s) returned %s, expected %s!", i.filename, camera, i.camera)
-		}
-	}
-}
-
-func TestGetDate(t *testing.T) {
-	for _, i := range testImages {
-		m, err := NewMediaFile(i.filename)
-		if err != nil {
-			t.Errorf("GetDate(%s) returned %s, expected %s!", i.filename, err.Error(), i.analyzeError.Error())
-		}
-		date, err := m.GetDate()
-		if err != nil {
-			t.Errorf("GetDate(%s) returned error %s!", i.filename, err.Error())
-		}
-		if date != i.date {
-			t.Errorf("GetDate(%s) returned %s, expected %s!", i.filename, date.String(), i.date.String())
-		}
-	}
-}
-
-func TestIsGeoTagged(t *testing.T) {
-	for _, i := range testImages {
-		m, err := NewMediaFile(i.filename)
-		if err != nil {
-			t.Errorf("IsGeoTagged(%s) returned %s, expected %s!", i.filename, err.Error(), i.analyzeError.Error())
-		}
-		geoTagged := m.IsGeoTagged()
-		if geoTagged != i.geoTagged {
-			t.Errorf("IsGeoTagged(%s) returned %v, expected %v!", i.filename, geoTagged, i.geoTagged)
+		if m != nil {
+			// Analyze
+			if numInfos := len(m.Info); numInfos != i.numInfos {
+				t.Errorf("Analyze(%s) returned %d infos, expected %d!", i.filename, numInfos, i.numInfos)
+			}
+			// Get with Flash exiftool tag
+			flash, err := m.Get("Flash")
+			if flash != i.flash {
+				t.Errorf("Get(%s)(Flash) returned %s, expected %s!", i.filename, flash, i.flash)
+			}
+			// GetLens
+			lens, err := m.GetLens()
+			if err != nil {
+				t.Errorf("GetLens(%s) returned error %s!", i.filename, err.Error())
+			}
+			if lens != i.lens {
+				t.Errorf("GetLens(%s) returned %s, expected %s!", i.filename, lens, i.lens)
+			}
+			// GetCamera
+			camera, err := m.GetCamera()
+			if err != nil {
+				t.Errorf("GetCamera(%s) returned error %s!", i.filename, err.Error())
+			}
+			if camera != i.camera {
+				t.Errorf("GetCamera(%s) returned %s, expected %s!", i.filename, camera, i.camera)
+			}
+			// GetDate
+			date, err := m.GetDate()
+			if err != nil {
+				t.Errorf("GetDate(%s) returned error %s!", i.filename, err.Error())
+			}
+			if date != i.date {
+				t.Errorf("GetDate(%s) returned %s, expected %s!", i.filename, date.String(), i.date.String())
+			}
+			// IsGeoTagged
+			geoTagged := m.IsGeoTagged()
+			if geoTagged != i.geoTagged {
+				t.Errorf("IsGeoTagged(%s) returned %v, expected %v!", i.filename, geoTagged, i.geoTagged)
+			}
 		}
 	}
 }
