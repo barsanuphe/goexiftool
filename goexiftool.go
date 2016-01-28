@@ -101,7 +101,11 @@ func (m *MediaFile) GetDate() (date time.Time, err error) {
 	}
 	date, err = time.Parse("2006:01:02 15:04:05", dateString)
 	if err != nil {
-		err = errors.New("Date has unexpected format: " + dateString)
+		// some files have better precision...
+		date, err = time.Parse("2006:01:02 15:04:05.00", dateString)
+		if err != nil {
+			err = errors.New("Date has unexpected format: " + dateString)
+		}
 	}
 	return
 }
