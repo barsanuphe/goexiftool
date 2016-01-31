@@ -27,8 +27,8 @@ func (m *MediaFile) String() string {
 	return txt
 }
 
-// Analyze calls exiftool on the file and parses its output.
-func (m *MediaFile) Analyze() (err error) {
+// AnalyzeMetadata calls exiftool on the file and parses its output.
+func (m *MediaFile) AnalyzeMetadata() (err error) {
 	cmdName, err := exec.LookPath("exiftool")
 	if err != nil {
 		return errors.New("exiftool is not installed")
@@ -140,6 +140,6 @@ func NewMediaFile(filename string) (mf *MediaFile, err error) {
 		return nil, err
 	}
 	mf = &MediaFile{Filename: filename, Info: make(map[string]string)}
-	err = mf.Analyze()
+	err = mf.AnalyzeMetadata()
 	return
 }
