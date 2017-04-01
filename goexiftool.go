@@ -28,12 +28,15 @@ func (m *MediaFile) String() string {
 }
 
 // AnalyzeMetadata calls exiftool on the file and parses its output.
-func (m *MediaFile) AnalyzeMetadata() (err error) {
+func (m *MediaFile) AnalyzeMetadata(args []string) (err error) {
 	cmdName, err := exec.LookPath("exiftool")
 	if err != nil {
 		return errors.New("exiftool is not installed")
 	}
-	cmdArgs := []string{m.Filename}
+	var cmdArgs = []string{m.Filename}
+	if len(args) > 0 {
+		cmdArgs = append(args, m.Filename)
+	}
 	cmd := exec.Command(cmdName, cmdArgs...)
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
@@ -134,12 +137,12 @@ func getExistingPath(path string) (existingPath string, err error) {
 }
 
 // NewMediaFile initializes a MediaFile and parses its metadata with exiftool.
-func NewMediaFile(filename string) (mf *MediaFile, err error) {
+func NewMediaFile(filename string, args ...string) (mf *MediaFile, err error) {
 	filename, err = getExistingPath(filename)
 	if os.IsNotExist(err) {
 		return nil, err
 	}
 	mf = &MediaFile{Filename: filename, Info: make(map[string]string)}
-	err = mf.AnalyzeMetadata()
+	err = mf.AnalyzeMetadata(args)
 	return
 }
