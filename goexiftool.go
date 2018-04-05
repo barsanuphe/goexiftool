@@ -41,7 +41,7 @@ func (m *MediaFile) AnalyzeMetadata(args []string) (err error) {
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
-		os.Exit(1)
+		return
 	}
 
 	scanner := bufio.NewScanner(cmdReader)
@@ -57,13 +57,13 @@ func (m *MediaFile) AnalyzeMetadata(args []string) (err error) {
 	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
-		os.Exit(1)
+		return
 	}
 
 	err = cmd.Wait()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
-		os.Exit(1)
+		return
 	}
 	return
 }
