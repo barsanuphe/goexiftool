@@ -48,9 +48,11 @@ func (m *MediaFile) AnalyzeMetadata(args []string) (err error) {
 	go func() {
 		for scanner.Scan() {
 			res := strings.SplitN(scanner.Text(), ":", 2)
-			key := strings.TrimSpace(res[0])
-			value := strings.TrimSpace(res[1])
-			m.Info[key] = value
+			if len(res) > 1 {
+				key := strings.TrimSpace(res[0])
+				value := strings.TrimSpace(res[1])
+				m.Info[key] = value
+			}
 		}
 	}()
 
