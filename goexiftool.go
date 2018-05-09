@@ -41,29 +41,31 @@ func (m *MediaFile) AnalyzeMetadata(args []string) (err error) {
 	cmdReader, err := cmd.StdoutPipe()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error creating StdoutPipe for Cmd", err)
-		os.Exit(1)
+		return
 	}
 
 	scanner := bufio.NewScanner(cmdReader)
 	go func() {
 		for scanner.Scan() {
 			res := strings.SplitN(scanner.Text(), ":", 2)
-			key := strings.TrimSpace(res[0])
-			value := strings.TrimSpace(res[1])
-			m.Info[key] = value
+			if len(res) > 1 {
+				key := strings.TrimSpace(res[0])
+				value := strings.TrimSpace(res[1])
+				m.Info[key] = value
+			}
 		}
 	}()
 
 	err = cmd.Start()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error starting Cmd", err)
-		os.Exit(1)
+		return
 	}
 
 	err = cmd.Wait()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Error waiting for Cmd", err)
-		os.Exit(1)
+		return
 	}
 	return
 }
